@@ -189,7 +189,12 @@ class SegmentationUnet(nn.Module):
         B, C, H, W = x.size()
         x = self.embedding(x)
 
-        x = x.permute(0, 1, 3, 2, 4)
+        assert x.shape == (B, C, H, W, self.dim)
+
+        x = x.permute(0, 1, 4, 2, 3)
+
+        assert x.shape == (B, C, self.dim, H, W)
+
         x = x.reshape(B, C * self.dim, H, W)
         t = self.time_pos_emb(time)
         t = self.mlp(t)
