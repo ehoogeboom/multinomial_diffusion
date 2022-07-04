@@ -172,13 +172,6 @@ class MultinomialDiffusion(torch.nn.Module):
         # q(xt-1 | xt, x0) = q(xt | xt-1, x0) * q(xt-1 | x0) / q(xt | x0)
         # where q(xt | xt-1, x0) = q(xt | xt-1).
 
-        # EV_log_qxt_x0 = self.q_pred(log_x_start, t)
-
-        # print('sum exp', EV_log_qxt_x0.exp().sum(1).mean())
-        # assert False
-
-        # log_qxt_x0 = (log_x_t.exp() * EV_log_qxt_x0).sum(dim=1)
-
         t_minus_1 = t - 1
         # Remove negative values, will not be used anyway for final decoder
         t_minus_1 = torch.where(t_minus_1 < 0, torch.zeros_like(t_minus_1), t_minus_1)
@@ -188,8 +181,7 @@ class MultinomialDiffusion(torch.nn.Module):
         t_broadcast = t.view(-1, *num_axes) * torch.ones_like(log_x_start)
         log_EV_qxtmin_x0 = torch.where(t_broadcast == 0, log_x_start, log_EV_qxtmin_x0)
 
-        # unnormed_logprobs = log_EV_qxtmin_x0 +
-        #                     log q_pred_one_timestep(x_t, t)
+
         # Note: _NOT_ x_tmin1, which is how the formula is typically used!!!
         # Not very easy to see why this is true. But it is :)
         unnormed_logprobs = log_EV_qxtmin_x0 + self.q_pred_one_timestep(log_x_t, t)
