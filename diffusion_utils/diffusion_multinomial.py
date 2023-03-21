@@ -355,7 +355,8 @@ class MultinomialDiffusion(torch.nn.Module):
 
         elif self.loss_type == 'vb_all':
             # Expensive, dont do it ;).
-            return -self.nll(x)
+            log_x_onehot = index_to_log_onehot(x, self.num_classes)
+            return -self.nll(log_x_onehot)
         else:
             raise ValueError()
 
